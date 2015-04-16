@@ -1,28 +1,13 @@
 #!/bin/sh
+BASEDIR=$(dirname $(readlink -e $0 ))
 
 #Clean up old nginx builds
-sudo rm -rf ~/rpmbuild/RPMS/*/nginx-*.rpm
-
-#Install required packages for building
-sudo yum install -y \
-    rpm-build \
-    rpmdevtools \
-    yum-utils \
-    mercurial \
-    git \
-    wget
-
+rm -rf ~/rpmbuild/
 
 #Install source RPM for Nginx
 pushd ~
-echo """[nginx]
-name=nginx repo
-baseurl=http://nginx.org/packages/centos/6/SRPMS/
-gpgcheck=0
-enabled=1""" >> nginx.repo
-sudo cp nginx.repo /etc/yum.repos.d/
 yumdownloader --source nginx
-sudo rpm -ihv nginx*.src.rpm
+rpm -ihv nginx*.src.rpm
 popd
 
 
@@ -30,7 +15,7 @@ popd
 pushd ~/rpmbuild/SOURCES
 
 #Headers More module
-git clone https://github.com/agentzh/headers-more-nginx-module.git -b v0.25
+#git clone https://github.com/agentzh/headers-more-nginx-module.git -b v0.25
 
 #Fancy Index module
 git clone https://github.com/aperezdc/ngx-fancyindex.git -b v0.3.4
@@ -42,7 +27,13 @@ git clone https://github.com/yaoweibin/nginx_ajp_module.git -b v0.3.0
 git clone https://github.com/kvspb/nginx-auth-ldap.git
 
 #Shibboleth module
-git clone https://github.com/nginx-shib/nginx-http-shibboleth.git
+#git clone https://github.com/nginx-shib/nginx-http-shibboleth.git
+
+#ngx-devel-kit
+git clone https://github.com/simpl/ngx_devel_kit.git
+
+#set misc module
+git clone https://github.com/openresty/set-misc-nginx-module.git
 
 popd
 
@@ -54,12 +45,12 @@ if [ -d "/vagrant" ]; then
     cp /vagrant/nginx-eresearch.patch ~/rpmbuild/SPECS/
     cp /vagrant/nginx-xslt-html-parser.patch ~/rpmbuild/SOURCES/
 fi
-patch -p1 < nginx-eresearch.patch
+patch -p0 < ${BASEDIR}/nginx-eresearch.patch
 spectool -g -R nginx.spec
 yum-builddep -y nginx.spec
 rpmbuild -ba nginx.spec
 
 #Test installation and check output
-sudo yum remove -y nginx nginx-devel
-sudo yum install -y ~/rpmbuild/RPMS/*/nginx-*.rpm
-nginx -V
+#sudo yum remove -y nginx nginx-devel
+#sudo yum install -y ~/rpmbuild/RPMS/*/nginx-*.rpm
+#nginx -V

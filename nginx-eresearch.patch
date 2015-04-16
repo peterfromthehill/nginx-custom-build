@@ -1,17 +1,17 @@
-diff --git a/nginx.spec b/nginx.spec
-index 2a35cc0..1377adc 100644
---- a/nginx.spec
-+++ b/nginx.spec
-@@ -74,12 +74,21 @@ Source7: nginx.suse.init
+--- nginx.spec	2015-04-07 18:41:45.000000000 +0200
++++ ../../nginx-custom-build/nginx.spec2	2015-04-16 16:44:18.072000000 +0200
+@@ -74,12 +74,23 @@
  Source8: nginx.service
  Source9: nginx.upgrade.sh
  Source10: nginx.suse.logrotate
-+Source100: headers-more-nginx-module
++#Source100: headers-more-nginx-module
 +Source101: ngx-fancyindex
 +Source102: nginx_ajp_module
-+Source103: nginx-xslt-html-parser.patch
++#Source103: nginx-xslt-html-parser.patch
 +Source104: nginx-auth-ldap
-+Source105: nginx-http-shibboleth
++#Source105: nginx-http-shibboleth
++Source106: ngx_devel_kit
++Source107: set-misc-nginx-module
  
  License: 2-clause BSD-like license
  
@@ -24,44 +24,52 @@ index 2a35cc0..1377adc 100644
  
  Provides: webserver
  
-@@ -100,6 +109,12 @@ Not stripped version of nginx built with the debugging log support.
+@@ -100,6 +111,14 @@
  
  %prep
  %setup -q
-+cp -R -p %SOURCE100 .
++#cp -R -p %SOURCE100 .
 +cp -R -p %SOURCE101 .
 +cp -R -p %SOURCE102 .
-+patch -p1 < %SOURCE103
++#patch -p1 < %SOURCE103
 +cp -R -p %SOURCE104 .
-+cp -R -p %SOURCE105 .
++#cp -R -p %SOURCE105 .
++cp -R -p %SOURCE106 .
++cp -R -p %SOURCE107 .
  
  %build
  ./configure \
-@@ -137,6 +152,13 @@ Not stripped version of nginx built with the debugging log support.
+@@ -136,7 +155,14 @@
+         --with-ipv6 \
          --with-debug \
          %{?with_spdy:--with-http_spdy_module} \
-         --with-cc-opt="%{optflags} $(pcre-config --cflags)" \
-+        --with-http_spdy_module \
-+        --with-http_xslt_module \
-+        --add-module=%{_builddir}/%{name}-%{version}/ngx-fancyindex \
-+        --add-module=%{_builddir}/%{name}-%{version}/nginx_ajp_module \
-+        --add-module=%{_builddir}/%{name}-%{version}/headers-more-nginx-module \
-+        --add-module=%{_builddir}/%{name}-%{version}/nginx-auth-ldap \
-+        --add-module=%{_builddir}/%{name}-%{version}/nginx-http-shibboleth \
+-        --with-cc-opt="%{optflags} $(pcre-config --cflags)" \
++	--with-http_spdy_module \
++	--with-http_xslt_module \
++	--with-cc-opt="%{optflags} $(pcre-config --cflags)" \
++	--add-module=%{_builddir}/%{name}-%{version}/ngx-fancyindex \
++	--add-module=%{_builddir}/%{name}-%{version}/nginx_ajp_module \
+#	--add-module=%{_builddir}/%{name}-%{version}/headers-more-nginx-module \
++	--add-module=%{_builddir}/%{name}-%{version}/nginx-auth-ldap \
+#	--add-module=%{_builddir}/%{name}-%{version}/nginx-http-shibboleth \
++	--add-module=%{_builddir}/%{name}-%{version}/ngx_devel_kit \
++	--add-module=%{_builddir}/%{name}-%{version}/set-misc-nginx-module \
          $*
  make %{?_smp_mflags}
  %{__mv} %{_builddir}/%{name}-%{version}/objs/nginx \
-@@ -175,6 +197,13 @@ make %{?_smp_mflags}
+@@ -175,6 +203,13 @@
          --with-ipv6 \
          %{?with_spdy:--with-http_spdy_module} \
          --with-cc-opt="%{optflags} $(pcre-config --cflags)" \
-+        --with-http_spdy_module \
-+        --with-http_xslt_module \
-+        --add-module=%{_builddir}/%{name}-%{version}/ngx-fancyindex \
-+        --add-module=%{_builddir}/%{name}-%{version}/nginx_ajp_module \
-+        --add-module=%{_builddir}/%{name}-%{version}/headers-more-nginx-module \
-+        --add-module=%{_builddir}/%{name}-%{version}/nginx-auth-ldap \
-+        --add-module=%{_builddir}/%{name}-%{version}/nginx-http-shibboleth \
++	--with-http_spdy_module \
++	--with-http_xslt_module \
++	--add-module=%{_builddir}/%{name}-%{version}/ngx-fancyindex \
++	--add-module=%{_builddir}/%{name}-%{version}/nginx_ajp_module \
+#	--add-module=%{_builddir}/%{name}-%{version}/headers-more-nginx-module \
++	--add-module=%{_builddir}/%{name}-%{version}/nginx-auth-ldap \
+#	--add-module=%{_builddir}/%{name}-%{version}/nginx-http-shibboleth \
++	--add-module=%{_builddir}/%{name}-%{version}/ngx_devel_kit \
++	--add-module=%{_builddir}/%{name}-%{version}/set-misc-nginx-module \
          $*
  make %{?_smp_mflags}
  
